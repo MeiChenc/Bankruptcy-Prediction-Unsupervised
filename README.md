@@ -1,74 +1,60 @@
 # Bankruptcy Prediction (Imbalanced Classification)
 
-This project predicts corporate bankruptcy (`Bankrupt?`) using financial ratios. The analysis focuses on handling severe class imbalance, tuning multiple models, and selecting an optimal decision threshold. The full workflow and outputs live in `Bankruptcy_Prediction.ipynb`.
+Notebook-driven workflow for predicting corporate bankruptcy (`Bankrupt?`) using financial ratios, heavy class-imbalance mitigation, and threshold tuning. The entire experiment—including EDA, resampling, training, and exports—lives inside `Bankruptcy_Prediction.ipynb`.
 
-## Highlights
+## Dataset & Problem
+- 5,455 companies, 97 columns (170 bankrupt vs. 5,285 solvent → ≈3% positives).
+- Target label is `Bankrupt?`; features are numeric ratios from the public Kaggle dataset.
+- Predictions are exported as CSVs for downstream evaluation or competitions.
 
-- Dataset size: 5,455 companies with 97 columns (including the target).
-- Class imbalance: 170 bankrupt vs. 5,285 non-bankrupt (≈96.88% non-bankrupt).
-- Imbalance handling: `RandomOverSampler` to balance training data.
-- Models compared: Logistic Regression, Random Forest, XGBoost.
-- Evaluation: 5-fold cross validation, threshold optimization on F1, ROC AUC, Accuracy, Confusion Matrix.
+## Repository Layout
+- `Bankruptcy_Prediction.ipynb` – primary notebook (EDA, modeling, exports).
+- `assets/` – figures rendered from the notebook and referenced by this README.
+- `README.md` – project overview and reproduction guide.
+- (Optional) place `train.csv`, `test.csv`, and generated outputs in the repo root or an `artifacts/` folder and update notebook paths accordingly.
 
-## Model Comparison (Notebook Results)
+## Environment Setup
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install --upgrade pip
+pip install pandas numpy scikit-learn imbalanced-learn xgboost seaborn matplotlib jupyter
+```
+If you lint notebooks or helper scripts, add `nbqa black` and `black` to the toolchain.
 
+## Running the Analysis
+1. Copy training/testing CSVs locally (default cell paths use `/content/...`, so adjust them to relative paths like `./train.csv`).
+2. Launch `jupyter lab Bankruptcy_Prediction.ipynb` (or `jupyter notebook ...`).
+3. Run cells sequentially; restart the kernel before re-running the modeling block to avoid stale data.
+4. Export predictions from the final section (e.g., `rf_bankruptcy_predictions.csv`) and verify metrics against the table below.
+
+## Modeling Workflow & Techniques
+1. **EDA** – distributions, Spearman correlation, and key ratios to understand signal.
+2. **Imbalance handling** – `RandomOverSampler` on the training split prior to fitting.
+3. **Models** – Logistic Regression (`C=1`, `penalty=l1`, `solver=liblinear`), Random Forest (`n_estimators=100`, `max_depth=10`, `min_samples_split=5`), XGBoost (`n_estimators=200`, `learning_rate=0.01`, `max_depth=3`).
+4. **Evaluation** – 5-fold cross-validation on probabilities, followed by F1-oriented threshold search plus ROC AUC, accuracy, and confusion matrices.
+5. **Selection** – Random Forest provides the published predictions; XGBoost is included for F1 comparisons.
+
+## Results
 | Model | Best Threshold | F1 | ROC AUC | Accuracy |
 | --- | --- | --- | --- | --- |
 | Logistic Regression | 0.202 | 0.420 | 0.903 | 0.961 |
-| Random Forest | 0.192 | 0.460 | 0.937 | 0.955 |
+| Random Forest | 0.192 | 0.460 | **0.937** | 0.955 |
 | XGBoost | 0.172 | **0.468** | 0.932 | 0.957 |
 
-**Notes**
-- The notebook uses Random Forest for the final test-set predictions.
-- If you prioritize F1, XGBoost is slightly better; if you prioritize ROC AUC, Random Forest is marginally stronger.
+Choose XGBoost when maximizing F1; prefer Random Forest when ROC AUC and interpretability are valued; Logistic Regression offers a transparent baseline.
 
-## Figures from the Research Notebook
+## Visual References
+Exploratory and evaluation figures are stored in `assets/`:
+- ![Spearman correlation heatmap](assets/notebook-figure-2.png)
+- ![Feature correlation coefficients](assets/notebook-figure-3.png)
+- ![ROC curve comparison](assets/notebook-figure-10.png)
+- ![Confusion matrices](assets/notebook-figure-14.png)
+- ![F1 score comparison](assets/notebook-figure-11.png)
 
-### Exploratory Analysis
+## Reproducibility Tips
+- Keep random seeds (`np.random.seed`, estimator seeds) fixed across runs for comparable metrics.
+- Document any feature filtering or preprocessing edits in the notebook markdown blocks.
+- Avoid committing raw CSVs; instead, describe acquisition paths and add them to `.gitignore`.
 
-![Spearman correlation heatmap](assets/notebook-figure-2.png)
-
-![Feature correlation coefficients](assets/notebook-figure-3.png)
-
-### Model Evaluation
-
-![ROC curve comparison](assets/notebook-figure-10.png)
-
-![Confusion matrices](assets/notebook-figure-14.png)
-
-![F1 score comparison](assets/notebook-figure-11.png)
-
-## Workflow Summary
-
-1. Load and inspect training data (features + `Bankrupt?`).
-2. Exploratory analysis (distributions, Spearman correlation heatmap).
-3. Address class imbalance via random oversampling.
-4. Train and tune:
-   - Logistic Regression (`C=1`, `penalty=l1`, `solver=liblinear`).
-   - Random Forest (`n_estimators=100`, `max_depth=10`, `min_samples_split=5`).
-   - XGBoost (`n_estimators=200`, `learning_rate=0.01`, `max_depth=3`).
-5. Evaluate with CV probabilities, select best F1 threshold, and compare metrics.
-6. Generate predictions for the test set and export to CSV.
-
-## Data Inputs and Outputs
-
-- **Training data**: `train.csv` (must include `Bankrupt?`).
-- **Test data**: `test.csv` (no `Bankrupt?`).
-- **Output**: `rf_bankruptcy_predictions.csv` (ID + prediction).
-
-> The notebook currently references `/content/train (1).csv` and `/content/test (2).csv`. Update these paths for your environment.
-
-## How to Run
-
-1. Install dependencies:
-   ```bash
-   pip install pandas numpy scikit-learn imbalanced-learn xgboost seaborn matplotlib
-   ```
-2. Open `Bankruptcy_Prediction.ipynb`.
-3. Update file paths and run all cells.
-
-## Project Files
-
-- `Bankruptcy_Prediction.ipynb`: complete analysis, training, and evaluation.
-- `README.md`: project overview and summary results.
-- `assets/`: images exported from the notebook outputs.
+## Contributing / Next Steps
+Pull requests should describe the notebook section modified, attach screenshots of new figures, and call out dependency or data-path changes. Potential next steps include adding SHAP-based explainability cells, setting up a lightweight `pytest` suite for helper utilities, or exporting the best model via `joblib` for serving.
