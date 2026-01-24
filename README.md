@@ -1,6 +1,22 @@
 # Bankruptcy Prediction (Imbalanced Classification)
 
+## Overview
+This project develops a supervised learning framework for early detection of corporate financial distress under extreme class imbalance.
+The goal is not point prediction accuracy, but to generate robust early-warning risk signals that can support credit risk monitoring and portfolio-level decision-making.
+
+## Problem Framing
+Corporate bankruptcy is a rare but high-impact event. Traditional accuracy-driven models often fail to capture distress signals due to severe class imbalance and noisy financial data.
+This project reframes bankruptcy prediction as a risk detection problem, prioritizing recall, stability, and interpretability over headline accuracy metrics.
+
 Notebook-driven workflow for predicting corporate bankruptcy (`Bankrupt?`) using financial ratios, heavy class-imbalance mitigation, and threshold tuning. The entire experiment—including EDA, resampling, training, and exports—lives inside `Bankruptcy_Prediction.ipynb`.
+
+## Decision Context
+Model outputs are designed to function as early-warning indicators rather than binary predictions.
+
+Use cases include:
+- Credit risk monitoring
+- Screening for further fundamental or covenant analysis
+- Stress testing and portfolio risk assessment
 
 ## Dataset & Problem
 - 5,455 companies, 97 columns (170 bankrupt vs. 5,285 solvent → ≈3% positives).
@@ -50,6 +66,11 @@ Exploratory and evaluation figures are stored in `assets/`:
 - ![ROC curve comparison](assets/notebook-figure-10.png)
 - ![Confusion matrices](assets/notebook-figure-14.png)
 - ![F1 score comparison](assets/notebook-figure-11.png)
+
+## Limitations
+- Labels rely on historical bankruptcy events and may not capture all forms of financial distress.
+- Feature stability may vary across market regimes.
+- Outputs should be interpreted as risk signals, not deterministic forecasts.
 
 ## Reproducibility Tips
 - Keep random seeds (`np.random.seed`, estimator seeds) fixed across runs for comparable metrics.
