@@ -1,4 +1,4 @@
-# Bankruptcy Prediction (Imbalanced Classification)
+# Distressed Credit Early-Warning Model
 
 ## Overview
 This project develops a supervised learning framework for early detection of corporate financial distress under extreme class imbalance.
@@ -8,7 +8,8 @@ The goal is not point prediction accuracy, but to generate robust early-warning 
 Corporate bankruptcy is a rare but high-impact event. Traditional accuracy-driven models often fail to capture distress signals due to severe class imbalance and noisy financial data.
 This project reframes bankruptcy prediction as a risk detection problem, prioritizing recall, stability, and interpretability over headline accuracy metrics.
 
-Notebook-driven workflow for predicting corporate bankruptcy (`Bankrupt?`) using financial ratios, heavy class-imbalance mitigation, and threshold tuning. The entire experiment—including EDA, resampling, training, and exports—lives inside `Bankruptcy_Prediction.ipynb`.
+The workflow is organized around a primary analysis notebook that integrates EDA, model training, imbalance handling, and threshold optimization.
+The notebook serves as a reproducible research and evaluation environment rather than a one-off experiment.
 
 ## Decision Context
 Model outputs are designed to function as early-warning indicators rather than binary predictions.
@@ -58,6 +59,8 @@ If you lint notebooks or helper scripts, add `nbqa black` and `black` to the too
 | XGBoost | 0.172 | **0.468** | 0.932 | 0.957 |
 
 Choose XGBoost when maximizing F1; prefer Random Forest when ROC AUC and interpretability are valued; Logistic Regression offers a transparent baseline.
+Model choice should be guided by the downstream risk decision context rather than headline metrics alone.
+
 
 ## Visual References
 Exploratory and evaluation figures are stored in `assets/`:
